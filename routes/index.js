@@ -64,7 +64,8 @@ router.post('/tskg', function(req, res, next) {
     })
 });
 
-router.get('/ockg', function(req, res, next) {
+router.post('/ockg', function(req, res, next) {
+    const url = req.body.url;
     var path = require('path')
     var childProcess = require('child_process')
     var phantomjs = require('phantomjs')
@@ -72,7 +73,7 @@ router.get('/ockg', function(req, res, next) {
     console.log(__dirname)
     var childArgs = [
         path.join(__dirname, '../parse/ockg.js'),
-        'http://oc.kg/#/movie/id/12660'
+        url
     ]
     
     childProcess.execFile(binPath, childArgs, function(err, stdout, stderr) {
