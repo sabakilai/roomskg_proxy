@@ -25,7 +25,7 @@ router.get('/namba/movie/:id', function(req, res, next) {
     })
 });
 
-router.get('/namba/serial/:id', function(req,res,next){
+router.get('/namba/serials/:id', function(req,res,next){
     const serialId = req.params.id;
     const baseUrl = 'http://api.namba.kg/serial.php?episode_id=';
     request(baseUrl + serialId, function(err, response, body){
