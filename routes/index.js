@@ -25,10 +25,18 @@ router.get('/namba/movie/:id', function(req, res, next) {
     })
 });
 
-router.get('/namba/serials/:id', function(req,res,next){
-    const serialId = req.params.id;
-    const baseUrl = 'http://api.namba.kg/serial.php?episode_id=';
-    request(baseUrl + serialId, function(err, response, body){
+router.post('/namba/serials/', function(req,res,next){
+    
+    if (!req.body.episode || !req.body.client_ip || !req.body.referer || !req.body.user_agent) {
+        return res.json({success:false, error:'You have to provide parameters (episode,client_ip, referer, user_agent)'});
+    }
+    const baseUrl = 'http://api.namba.kg/serial-p2.php?' +
+                    `episode_id=${req.body.episode}&`+
+                    `client_ip=${req.body.client_ip}`+
+                    `&referer=${req.body.referer}`+
+                    `user_agent=${req.body.user_agent}`;
+
+    request(baseUrl, function(err, response, body){
         if (err) res.json({status:false, data:err});
 
         const serieData = JSON.parse(body);
