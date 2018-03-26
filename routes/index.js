@@ -4,36 +4,40 @@ var router = express.Router();
 var cheerio = require('cheerio');
 var request = require('request');
 
-/* GET home page. */
 router.get('/', function(req, res, next) {
     res.json({success:true, name:"Rooms.kg proxy"});
 });
 
-router.get('/namba/movie/:id', function(req, res, next) {
-    const movieId = req.params.id;
-    const baseUrl = 'http://namba.kg/movie/watch.php?id=';
-
-    request(baseUrl + movieId, function(err, response, body){
+router.post('/namba/movie/', function(req,res,next){
+    if (!req.body.episode || !req.body.client_ip || !req.body.referer || !req.body.user_agent) {
+        return res.json({success:false, error:'You have to provide parameters (episode,client_ip, referer, user_agent)'});
+    }
+    
+    const baseUrl = 'http://api.namba.kg/mov-unprotected.php?' +
+                    `id=${req.body.episode}&`+
+                    `client_ip=${req.body.client_ip}&`+
+                    `referer=${req.body.referer}&`+
+                    `user_agent=${req.body.user_agent}`;
+    request(baseUrl, function(err, response, body){
         if (err) res.json({status:false, data:err});
-        $ = cheerio.load(body);
-        if ($('#download')[0] && $('#download')[0].attribs && $('#download')[0].attribs.href) {
-            let data = $('#download')[0].attribs.href;
-            res.json({success:true, data:data});
+
+        const serieData = JSON.parse(body);
+        if (serieData.video_link) {
+            res.json({success:true, data:serieData.video_link });        
         } else {
             res.json({success:false, data:'No_video'});
         }
     })
-});
+})
 
 router.post('/namba/serials/', function(req,res,next){
-    
     if (!req.body.episode || !req.body.client_ip || !req.body.referer || !req.body.user_agent) {
         return res.json({success:false, error:'You have to provide parameters (episode,client_ip, referer, user_agent)'});
     }
     const baseUrl = 'http://api.namba.kg/serial-p2.php?' +
                     `episode_id=${req.body.episode}&`+
-                    `client_ip=${req.body.client_ip}`+
-                    `&referer=${req.body.referer}`+
+                    `client_ip=${req.body.client_ip}&`+
+                    `referer=${req.body.referer}&`+
                     `user_agent=${req.body.user_agent}`;
 
     request(baseUrl, function(err, response, body){
